@@ -12,6 +12,10 @@ param virtualMachineName string
 ])
 param osDiskType string = 'Standard_LRS'
 
+@description('Ubuntu OS Version')
+@allowed(['18.04', '22.04'])
+param osVersion string = '18.04'
+
 @description('Admin username')
 param adminUsername string
 
@@ -35,7 +39,22 @@ param location string = resourceGroup().location
 var extensionName = 'CustomScript'
 var nicName = '${virtualMachineName}-NIC'
 var publicIPAddressName = '${virtualMachineName}-PublicIP'
-var subnet1Ref = resourceId('Microsoft.Network/virtualNetworks/subnets', existingVirtualNetworkName, existingSubnet)
+var subnetResourceId = resourceId('Microsoft.Network/virtualNetworks/subnets', existingVirtualNetworkName, existingSubnet)
+
+var osVersionDefinitions = {  
+  '18.04': {
+    publisher: 'Canonical'
+    offer: 'UbuntuServer'
+    sku: '18.04-LTS'
+    version: 'latest'
+  }
+  '22.04': {
+    publisher: 'Canonical'
+    offer: '0001-com-ubuntu-server-jammy'
+    sku: '22_04-lts'
+    version: 'latest'
+  }
+}
 
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2017-03-30' = {
   name: virtualMachineName
@@ -50,12 +69,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2017-03-30' = {
       vmSize: virtualMachineSize
     }
     storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: 'UbuntuServer'
-        sku: '18.04-LTS'
-        version: 'latest'
-      }
+      imageReference: osVersionDefinitions[osVersion]
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
@@ -87,7 +101,7 @@ resource NIC 'Microsoft.Network/networkInterfaces@2017-06-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: subnet1Ref
+            id: subnetResourceId
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "3970831031631876699"
+      "templateHash": "9994432888891458854"
     }
   },
   "parameters": {
@@ -32,6 +32,17 @@
       ],
       "metadata": {
         "description": "Select Disk Type: Premium SSD (Premium_LRS), Standard SSD (StandardSSD_LRS), Standard HDD (Standard_LRS)"
+      }
+    },
+    "osVersion": {
+      "type": "string",
+      "defaultValue": "18.04",
+      "allowedValues": [
+        "18.04",
+        "22.04"
+      ],
+      "metadata": {
+        "description": "Ubuntu OS Version"
       }
     },
     "adminUsername": {
@@ -81,7 +92,21 @@
     "extensionName": "CustomScript",
     "nicName": "[format('{0}-NIC', parameters('virtualMachineName'))]",
     "publicIPAddressName": "[format('{0}-PublicIP', parameters('virtualMachineName'))]",
-    "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'), parameters('existingSubnet'))]"
+    "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'), parameters('existingSubnet'))]",
+    "osVersionDefinitions": {
+      "18.04": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "18.04-LTS",
+        "version": "latest"
+      },
+      "22.04": {
+        "publisher": "Canonical",
+        "offer": "0001-com-ubuntu-server-jammy",
+        "sku": "22_04-lts",
+        "version": "latest"
+      }
+    }
   },
   "resources": [
     {
@@ -99,12 +124,7 @@
           "vmSize": "[parameters('virtualMachineSize')]"
         },
         "storageProfile": {
-          "imageReference": {
-            "publisher": "Canonical",
-            "offer": "UbuntuServer",
-            "sku": "18.04-LTS",
-            "version": "latest"
-          },
+          "imageReference": "[variables('osVersionDefinitions')[parameters('osVersion')]]",
           "osDisk": {
             "createOption": "FromImage",
             "managedDisk": {
@@ -140,7 +160,7 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[variables('subnet1Ref')]"
+                "id": "[variables('subnetResourceId')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
