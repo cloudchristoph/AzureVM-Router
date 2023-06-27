@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "9994432888891458854"
+      "templateHash": "15311007346126069822"
     }
   },
   "parameters": {
@@ -127,6 +127,7 @@
           "imageReference": "[variables('osVersionDefinitions')[parameters('osVersion')]]",
           "osDisk": {
             "createOption": "FromImage",
+            "name": "[format('{0}-OSDisk', parameters('virtualMachineName'))]",
             "managedDisk": {
               "storageAccountType": "[parameters('osDiskType')]"
             }

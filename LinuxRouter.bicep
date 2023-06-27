@@ -72,6 +72,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2017-03-30' = {
       imageReference: osVersionDefinitions[osVersion]
       osDisk: {
         createOption: 'FromImage'
+        name: '${virtualMachineName}-OSDisk'
         managedDisk: {
           storageAccountType: osDiskType
         }
