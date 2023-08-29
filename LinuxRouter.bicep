@@ -34,7 +34,13 @@ param scriptUri string = uri(deployment().properties.templateLink.uri, 'linuxrou
 
 @description('Command to run the script')
 param scriptCmd string = 'sh linuxrouter.sh'
+
+@description('Azure region for all resources.')
 param location string = resourceGroup().location
+
+@description('Deploy Public IP Address')
+param deployPublicIpAdress bool = true
+
 
 var extensionName = 'CustomScript'
 var nicName = '${virtualMachineName}-NIC'
@@ -85,14 +91,14 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2017-03-30' = {
           properties: {
             primary: true
           }
-          id: NIC.id
+          id: nic.id
         }
       ]
     }
   }
 }
 
-resource NIC 'Microsoft.Network/networkInterfaces@2017-06-01' = {
+resource nic 'Microsoft.Network/networkInterfaces@2017-06-01' = {
   name: nicName
   location: location
   properties: {
@@ -105,16 +111,16 @@ resource NIC 'Microsoft.Network/networkInterfaces@2017-06-01' = {
             id: subnetResourceId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
+          publicIPAddress: deployPublicIpAdress ? {
             id: publicIpAddress.id
-          }
+          } : {}
         }
       }
     ]
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2017-06-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2017-06-01' = if (deployPublicIpAdress) {
   name: publicIPAddressName
   location: location
   properties: {

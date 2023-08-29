@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "15311007346126069822"
+      "templateHash": "8447943621579897121"
     }
   },
   "parameters": {
@@ -85,7 +85,17 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]"
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "deployPublicIpAdress": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Deploy Public IP Address"
+      }
     }
   },
   "variables": {
@@ -164,9 +174,7 @@
                 "id": "[variables('subnetResourceId')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
-              }
+              "publicIPAddress": "[if(parameters('deployPublicIpAdress'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))), createObject())]"
             }
           }
         ]
@@ -176,6 +184,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployPublicIpAdress')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2017-06-01",
       "name": "[variables('publicIPAddressName')]",

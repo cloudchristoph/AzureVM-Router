@@ -37,6 +37,9 @@ param scriptCmd string = 'sh linuxrouter.sh'
 @description('Azure region for all resources.')
 param location string = resourceGroup().location
 
+@description('Deploy Public IP Address')
+param deployPublicIpAdress bool = true
+
 var extensionName = 'CustomScript'
 var nicName = '${virtualMachineName}-nic'
 var publicIPAddressName = '${virtualMachineName}-PublicIP'
@@ -131,16 +134,16 @@ resource nic 'Microsoft.Network/networkInterfaces@2017-06-01' = {
             id: subnet.id
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
+          publicIPAddress: deployPublicIpAdress ? {
             id: publicIpAddress.id
-          }
+          } : {}
         }
       }
     ]
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2017-06-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2017-06-01' = if (deployPublicIpAdress) {
   name: publicIPAddressName
   location: location
   properties: {
