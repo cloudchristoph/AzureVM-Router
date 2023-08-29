@@ -111,9 +111,9 @@ resource nic 'Microsoft.Network/networkInterfaces@2017-06-01' = {
             id: subnetResourceId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployPublicIpAdress ? {
-            id: publicIpAddress.id
-          } : {}
+          publicIPAddress: {
+            id: deployPublicIpAdress ? publicIpAddress.id : null
+          }
         }
       }
     ]

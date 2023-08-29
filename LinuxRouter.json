@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.18.4.5664",
-      "templateHash": "8447943621579897121"
+      "version": "0.20.4.51522",
+      "templateHash": "14501291190077084403"
     }
   },
   "parameters": {
@@ -174,7 +174,9 @@
                 "id": "[variables('subnetResourceId')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": "[if(parameters('deployPublicIpAdress'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))), createObject())]"
+              "publicIPAddress": {
+                "id": "[if(parameters('deployPublicIpAdress'), resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName')), null())]"
+              }
             }
           }
         ]
