@@ -11,6 +11,10 @@ sed -i "/net.ipv6.conf.all.accept_redirects = 0/ s/# *//" /etc/sysctl.conf
 
 if [ "$(lsb_release -r -s)" = "22.04" ]; then
   echo "Ubuntu 22.04 detected - using nftables"
+
+  echo "Installation Netfilter-Persistent & IPTables-Persistent"
+  apt-get -y install netfilter-persistent iptables-persistent
+
   nft add rule ip nat POSTROUTING ip daddr 10.0.0.0/8 counter accept
   nft add rule ip nat POSTROUTING ip daddr 172.16.0.0/12 counter accept
   nft add rule ip nat POSTROUTING ip daddr 192.168.0.0/16 counter accept
